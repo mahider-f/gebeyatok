@@ -9,6 +9,7 @@ export default async function handler(req,res){
   if (!user) return res.status(401).json({ error: 'invalid credentials' })
   const match = bcrypt.compareSync(password, user.password)
   if (!match) return res.status(401).json({ error: 'invalid credentials' })
-  const token = jwt.sign({ sub: user._id.toString(), email: user.email }, process.env.JWT_SECRET || 'dev', { expiresIn: '7d' })
+  if (!process.env.JWT_SECRET) return res.status(500).json({ error: 'server configuration error' })
+  const token = jwt.sign({ sub: user._id.toString(), email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' })
   return res.status(200).json({ ok: true, token })
 }
